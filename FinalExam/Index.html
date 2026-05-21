@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>華語教學英文｜25單元拼字練習</title>
+  <style>
+    :root{
+      --bg:#f7f7fb; --card:#fff; --ink:#1f2937; --muted:#6b7280;
+      --line:#e5e7eb; --accent:#2563eb; --ok:#15803d; --bad:#b91c1c;
+      --soft:#eef2ff; --warn:#fff7ed;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
+    header{padding:22px 18px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+    header h1{margin:0;font-size:22px}
+    header p{margin:6px 0 0;color:var(--muted);font-size:14px}
+    main{max-width:1040px;margin:0 auto;padding:20px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 4px 16px rgba(15,23,42,.04)}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .spacer{flex:1}
+    label{display:block;font-weight:650;margin:8px 0 6px}
+    input,textarea,select{width:100%;padding:11px 12px;border:1px solid #cfd6e2;border-radius:12px;font-size:16px;background:#fff}
+    input[type=file]{padding:8px}
+    button{border:0;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer;background:var(--accent);color:#fff;font-size:15px}
+    button.secondary{background:#e5e7eb;color:#111827}
+    button.ghost{background:#fff;color:var(--accent);border:1px solid #bfdbfe}
+    button.danger{background:#dc2626;color:#fff}
+    button:disabled{opacity:.45;cursor:not-allowed}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+    .unit{padding:14px;border:1px solid var(--line);border-radius:14px;background:#fff}
+    .unit.done{background:#f0fdf4;border-color:#bbf7d0}
+    .unit.locked{opacity:.55;background:#f3f4f6}
+    .unit h3{margin:0 0 6px;font-size:16px}
+    .unit p{margin:0 0 10px;color:var(--muted);font-size:13px;line-height:1.35}
+    .pill{display:inline-block;padding:4px 8px;background:var(--soft);border-radius:999px;font-size:12px;color:#3730a3;margin:2px}
+    .progress{height:10px;border-radius:999px;background:#e5e7eb;overflow:hidden}
+    .bar{height:100%;background:var(--accent);width:0%}
+    .choice{display:block;width:100%;text-align:left;background:#fff;color:var(--ink);border:1px solid #cfd6e2;margin:8px 0;padding:12px;border-radius:12px;font-weight:600}
+    .choice:hover{border-color:var(--accent);background:#eff6ff}
+    .feedback{padding:12px;border-radius:12px;margin-top:12px;line-height:1.5}
+    .feedback.ok{background:#ecfdf5;color:#065f46;border:1px solid #bbf7d0}
+    .feedback.bad{background:#fef2f2;color:#7f1d1d;border:1px solid #fecaca}
+    .hint{background:var(--warn);border:1px solid #fed7aa;color:#7c2d12;padding:10px;border-radius:12px;margin-top:10px}
+    .small{font-size:13px;color:var(--muted)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    .wordbank button{background:#fff;color:var(--ink);border:1px solid #cfd6e2;margin:4px}
+    .answerBox{min-height:48px;background:#f9fafb;border:1px dashed #cfd6e2;border-radius:12px;padding:10px;margin:8px 0}
+    table{width:100%;border-collapse:collapse}
+    th,td{border-bottom:1px solid var(--line);padding:9px;text-align:left;font-size:14px}
+    th{background:#f9fafb}
+    .hidden{display:none!important}
+  </style>
+</head>
+<body>
+<header>
+  <h1>華語教學英文｜25單元拼字練習</h1>
+  <p>從辨認、重組、填空到默寫。進度會自動儲存在本機，也可以匯出／匯入。</p>
+</header>
+<main>
+  <section id="loginCard" class="card">
+    <h2>開始前</h2>
+    <p class="small">請先輸入姓名與學號。系統會用瀏覽器自動存檔。</p>
+    <div class="row">
+      <div style="flex:1;min-width:220px">
+        <label>姓名</label>
+        <input id="studentName" placeholder="例如：王小明">
+      </div>
+      <div style="flex:1;min-width:220px">
+        <label>學號</label>
+        <input id="studentId" placeholder="例如：A123456">
+      </div>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <button id="startBtn">開始／讀取進度</button>
+      <button class="secondary" id="importBtnTop">匯入進度檔</button>
+      <input id="importFileTop" type="file" accept="application/json" class="hidden">
+    </div>
+  </section>
+
+  <section id="dashboard" class="hidden">
+    <div class="card">
+      <div class="row">
+        <div>
+          <h2 id="welcome" style="margin:0">歡迎回來</h2>
+          <p id="summary" class="small"></p>
+        </div>
+        <div class="spacer"></div>
+        <button class="ghost" id="exportBtn">匯出進度</button>
+        <button class="secondary" id="importBtn">匯入進度</button>
+        <input id="importFile" type="file" accept="application/json" class="hidden">
+        <button class="danger" id="resetBtn">重設進度</button>
+      </div>
+      <div class="progress" style="margin-top:14px"><div id="overallBar" class="bar"></div></div>
+    </div>
+
+    <div class="card">
+      <h2>25 個練習單元</h2>
+      <div id="unitGrid" class="grid"></div>
+    </div>
+
+    <div class="card">
+      <h2>我的錯題本</h2>
+      <p class="small">答錯的生詞或句子會自動記錄。從下一個單元開始，前面會加入少量錯題複習。</p>
+      <div id="wrongList"></div>
+    </div>
+  </section>
+
+  <section id="practice" class="hidden">
+    <div class="card">
+      <div class="row">
+        <div>
+          <h2 id="unitTitle" style="margin:0"></h2>
+          <p id="unitInfo" class="small"></p>
+        </div>
+        <div class="spacer"></div>
+        <button class="secondary" id="backBtn">回單元列表</button>
+      </div>
+      <div class="progress" style="margin-top:12px"><div id="unitBar" class="bar"></div></div>
+    </div>
+
+    <div class="card" id="questionCard">
+      <div class="row">
+        <span id="qType" class="pill"></span>
+        <span id="qCount" class="small"></span>
+      </div>
+      <h3 id="prompt"></h3>
+      <div id="questionArea"></div>
+      <div id="feedback"></div>
+      <div class="row" style="margin-top:14px">
+        <button id="nextBtn" class="hidden">下一題</button>
+        <button id="checkBtn">檢查答案</button>
+        <button class="secondary" id="hintBtn">提示</button>
+        <button class="ghost" id="showAnswerBtn">看答案並重打一次</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="result" class="hidden">
+    <div class="card">
+      <h2>本單元完成</h2>
+      <p id="resultText"></p>
+      <button id="resultBackBtn">回單元列表</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const STORAGE_KEY = "cte_spelling_game_v2";
+
+const wordData = [
+  {word:"character", meaning:"漢字；字", category:"漢字"},
+  {word:"stroke order", meaning:"筆順", category:"漢字"},
+  {word:"stroke", meaning:"筆畫", category:"漢字"},
+  {word:"horizontal", meaning:"橫的；橫畫", category:"漢字"},
+  {word:"vertical", meaning:"豎的；豎畫", category:"漢字"},
+  {word:"clue", meaning:"線索", category:"漢字"},
+  {word:"suggest", meaning:"暗示、提示", category:"漢字"},
+  {word:"top", meaning:"上面、頂部", category:"漢字"},
+  {word:"component", meaning:"部件", category:"漢字"},
+  {word:"radical", meaning:"部首", category:"漢字"},
+  {word:"bottom", meaning:"下面、底部", category:"漢字"},
+  {word:"structure", meaning:"結構", category:"漢字"},
+  {word:"arrange", meaning:"安排；排列", category:"漢字"},
+  {word:"semi-enclosed", meaning:"半包圍", category:"漢字"},
+  {word:"frame", meaning:"框架", category:"漢字"},
+  {word:"balance", meaning:"平衡", category:"漢字"},
+  {word:"enclose", meaning:"包圍", category:"漢字"},
+  {word:"grammar point", meaning:"語法點", category:"語法"},
+  {word:"grammar formula", meaning:"語法公式", category:"語法"},
+  {word:"form", meaning:"形式；結構", category:"語法"},
+  {word:"function", meaning:"功能", category:"語法"},
+  {word:"context", meaning:"使用情境；語境", category:"語法"},
+  {word:"word order", meaning:"語序", category:"語法"},
+  {word:"restriction", meaning:"限制", category:"語法"},
+  {word:"common error", meaning:"常見錯誤", category:"語法"},
+  {word:"application", meaning:"應用", category:"語法"},
+  {word:"grammar pattern", meaning:"語法句型", category:"語法"},
+  {word:"subject", meaning:"主語", category:"語法"},
+  {word:"verb", meaning:"動詞", category:"語法"},
+  {word:"emphasize", meaning:"強調", category:"語法"},
+  {word:"appropriate", meaning:"適合的；合宜的", category:"語法"},
+  {word:"completed action", meaning:"已完成的動作", category:"語法"},
+  {word:"contrast", meaning:"對比", category:"語法"},
+  {word:"confuse A with B", meaning:"把 A 和 B 混淆", category:"語法"},
+  {word:"situation", meaning:"情況", category:"語法"},
+  {word:"vocabulary", meaning:"詞彙", category:"詞彙"},
+  {word:"useful teacher language", meaning:"常用教師語言", category:"詞彙"},
+  {word:"meaning", meaning:"意思；意義", category:"詞彙"},
+  {word:"example sentence", meaning:"例句", category:"詞彙"},
+  {word:"strategy", meaning:"策略", category:"詞彙"},
+  {word:"tone", meaning:"聲調", category:"詞彙"},
+  {word:"adverb", meaning:"副詞", category:"詞彙"},
+  {word:"collocation", meaning:"搭配詞；詞語搭配", category:"詞彙"},
+  {word:"contrast", meaning:"相反、相對的", category:"詞彙"},
+  {word:"imagine", meaning:"想像", category:"詞彙"}
+];
+
+const sentenceData = [
+  {id:1, label:"1", text:"Today we are going to learn a new grammar point.", meaning:"今天我們要學一個新的語法點。", blanks:[{text:"grammar point"}]},
+  {id:2, label:"2", text:"Please look at the form and word order first.", meaning:"請先看形式／結構和語序。", blanks:[{text:"form", accept:["form","structure"]},{text:"word order"}]},
+  {id:3, label:"3", text:"This grammar pattern has a subject and a verb.", meaning:"這個語法句型有一個主語和一個動詞。", blanks:[{text:"grammar pattern"},{text:"subject"},{text:"verb"}]},
+  {id:4, label:"4", text:"This sentence has a clear function: to compare two things.", meaning:"這個句子有一個明確的功能：比較兩個東西。", blanks:[{text:"function"}]},
+  {id:5, label:"5", text:"In this context, this sentence is appropriate.", meaning:"在這個語境中，這個句子是合適的。", blanks:[{text:"context"},{text:"appropriate"}]},
+  {id:6, label:"6", text:"Pay attention to this common error.", meaning:"請注意這個常見錯誤。", blanks:[{text:"common error"}]},
+  {id:7, label:"7", text:"Don’t confuse A with B. They have different meanings.", meaning:"不要把 A 和 B 混淆。它們有不同的意思。", blanks:[{text:"confuse A with B"},{text:"meaning", accept:["meanings","meaning"]}]},
+  {id:8, label:"8", text:"This word is an adverb, so we put it before the verb.", meaning:"這個詞是副詞，所以我們把它放在動詞前面。", blanks:[{text:"adverb"},{text:"verb"}]},
+  {id:9, label:"9", text:"Let’s look at an example sentence together.", meaning:"我們一起看一個例句。", blanks:[{text:"example sentence"}]},
+  {id:10, label:"10", text:"Imagine this situation: your friend is not here.", meaning:"請想像這個情況：你的朋友不在這裡。", blanks:[{text:"imagine", replace:"Imagine"},{text:"situation"}]},
+  {id:11, label:"11-12", text:"This character has two components: the left part is the radical, and it gives us a clue about the meaning.", meaning:"這個漢字有兩個部件：左邊是部首／偏旁，它給我們一個意思上的線索。", blanks:[{text:"character"},{text:"component", replace:"components", accept:["components","component"]},{text:"radical"},{text:"clue"},{text:"meaning"}]},
+  {id:13, label:"13", text:"Look at the structure: the parts are arranged from left to right.", meaning:"請看這個結構：這些部分是從左到右排列的。", blanks:[{text:"structure"},{text:"arrange", replace:"arranged", accept:["arranged","arrange"]}]},
+  {id:14, label:"14", text:"When you write this character, follow the stroke order.", meaning:"寫這個字的時候，請按照筆順。", blanks:[{text:"character"},{text:"stroke order"}]},
+  {id:15, label:"15", text:"Write the top part first, and then the bottom part.", meaning:"先寫上面的部分，再寫下面的部分。", blanks:[{text:"top"},{text:"bottom"}]},
+  {id:16, label:"16", text:"This character has an enclosed structure.", meaning:"這是包圍結構。", blanks:[{text:"character"},{text:"enclose", replace:"enclosed", accept:["enclosed","enclose"]},{text:"structure"}]},
+  {id:17, label:"17", text:"Keep the parts balanced inside the frame.", meaning:"請讓各部分在框架裡保持平衡。", blanks:[{text:"balance", replace:"balanced", accept:["balanced","balance"]},{text:"frame"}]},
+  {id:18, label:"18", text:"The stroke order starts with a horizontal stroke, then a vertical stroke.", meaning:"筆順從橫畫開始，然後是豎畫。", blanks:[{text:"stroke order"},{text:"horizontal"},{text:"vertical"}]},
+  {id:19, label:"19", text:"The radical inside gives a clue to the meaning.", meaning:"裡面的部首提供字義線索。", blanks:[{text:"radical"},{text:"clue"},{text:"meaning"}]},
+  {id:20, label:"20", text:"The radical outside suggests the pronunciation.", meaning:"外面的部首提示發音。", blanks:[{text:"radical"},{text:"suggest", replace:"suggests", accept:["suggests","suggest"]}]}
+];
+
+const units = [
+  {id:1, title:"認識字與筆畫", goal:"只做選擇題，先建立信心。", words:[0,1,2,3,4], sentences:[14,18], mode:"recognition"},
+  {id:2, title:"部件與位置", goal:"認識漢字部件、部首與位置詞。", words:[5,6,7,8,9,10], sentences:[11,15,19,20], mode:"recognition"},
+  {id:3, title:"漢字結構詞", goal:"認識結構、排列、框架與包圍。", words:[11,12,13,14,15,16], sentences:[13,16,17], mode:"recognition"},
+  {id:4, title:"語法教學詞一", goal:"認識語法點、公式、形式、功能與語境。", words:[17,18,19,20,21], sentences:[1,2,4,5], mode:"recognition"},
+  {id:5, title:"語法與詞彙基本詞", goal:"認識語序、限制、常見錯誤、應用與詞彙。", words:[22,23,24,25,35,37], sentences:[6,9], mode:"recognition"},
+  {id:6, title:"短詞字母重組", goal:"開始拼寫，但只用短詞。", words:[19,5,7,10,14,40], sentences:[], mode:"unscramble"},
+  {id:7, title:"漢字教學詞重組", goal:"重組較長的漢字教學詞。", words:[0,2,8,9,11], sentences:[11], mode:"unscramble"},
+  {id:8, title:"語法片語首字母", goal:"用首字母提示練習語法片語。", words:[17,18,22,24,26], sentences:[1,2,3,6], mode:"initial"},
+  {id:9, title:"詞彙教學詞首字母", goal:"認識並拼寫詞彙教學常用詞。", words:[36,38,39,41,42,44], sentences:[9,10], mode:"initial"},
+  {id:10, title:"第一次小闖關", goal:"混合複習前面單元，仍保留提示。", words:"all", sentences:[1,2,9,11,18], mode:"mixedEasy"},
+  {id:11, title:"易錯拼法辨認", goal:"特別練 grammar, character, vocabulary 等常錯字。", words:[17,18,0,8,11,35,42,30], sentences:[], mode:"spellingChoice"},
+  {id:12, title:"漢字類缺字母", goal:"練習 stroke order, horizontal, vertical 等拼字。", words:[1,3,4,9,13,16], sentences:[14,18], mode:"blank"},
+  {id:13, title:"語法類缺字母", goal:"練習語法教學詞拼字。", words:[17,18,19,20,21,22,24], sentences:[1,2,4,5,6], mode:"blank"},
+  {id:14, title:"詞彙類缺字母", goal:"練習 vocabulary, collocation 等拼字。", words:[35,36,37,38,39,41,42,44], sentences:[9,10], mode:"blank"},
+  {id:15, title:"語法句關鍵詞填空", goal:"句子 1–8 的關鍵生詞填空。", words:[17,19,20,22,24,26,27,28,41], sentences:[1,2,3,4,5,6,7,8], mode:"sentenceBlank"},
+  {id:16, title:"詞彙與情境句", goal:"句子 9–10 的關鍵詞填空與短句重組。", words:[38,34,44], sentences:[9,10], mode:"sentenceBlank"},
+  {id:17, title:"漢字教學句一", goal:"句子 11–13 的關鍵詞填空。", words:[0,8,9,5,37,11,12], sentences:[11,13], mode:"sentenceBlank"},
+  {id:18, title:"漢字教學句二", goal:"句子 14–20 的關鍵詞填空。", words:[1,3,4,7,10,14,15,16], sentences:[14,15,16,17,18,19,20], mode:"sentenceBlank"},
+  {id:19, title:"短句重組", goal:"把短句排回正確順序。", words:[], sentences:[1,2,3,5,6,9,10,15,16,17], mode:"sentenceOrder"},
+  {id:20, title:"長句重組", goal:"把較長的句子分段重組。", words:[], sentences:[4,7,8,11,13,14,18,19,20], mode:"sentenceOrder"},
+  {id:21, title:"漢字類完整拼寫", goal:"只給中文，完整拼出英文生詞。", words:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16], sentences:[], mode:"dictationWords"},
+  {id:22, title:"語法類完整拼寫", goal:"語法類生詞完整拼寫。", words:[17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34], sentences:[], mode:"dictationWords"},
+  {id:23, title:"詞彙類完整拼寫", goal:"詞彙類生詞完整拼寫。", words:[35,36,37,38,39,40,41,42,43,44], sentences:[], mode:"dictationWords"},
+  {id:24, title:"句子半默寫", goal:"給中文與英文空格，填出關鍵詞。", words:"all", sentences:"all", mode:"sentenceBlankHard"},
+  {id:25, title:"最終任務", goal:"生詞與句子混合默寫，優先複習錯題。", words:"all", sentences:"all", mode:"final"}
+];
+
+let state = null;
+let currentUnit = null;
+let questions = [];
+let qIndex = 0;
+let score = 0;
+let selectedAnswer = null;
+let builtAnswer = [];
+let currentHintLevel = 0;
+
+function defaultState(name="", id=""){
+  return {studentName:name, studentId:id, completedUnits:[], unitScores:{}, wrongItems:{}, attempts:[], updatedAt:new Date().toISOString()};
+}
+function save(){ state.updatedAt = new Date().toISOString(); localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function load(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e){ return null; } }
+function normalize(s){
+  return String(s||"").trim().toLowerCase()
+    .replace(/[’‘]/g,"'")
+    .replace(/[。！？；：，、]/g,"")
+    .replace(/[.!?;:]/g,"")
+    .replace(/\s+/g," ");
+}
+function exact(a,b){ return normalize(a) === normalize(b); }
+function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+function sample(arr,n){ return shuffle(arr).slice(0,n); }
+function wordItems(indices){ return indices === "all" ? wordData : indices.map(i=>wordData[i]).filter(Boolean); }
+function sentenceItems(ids){ return ids === "all" ? sentenceData : ids.map(id=>sentenceData.find(s=>s.id===id)).filter(Boolean); }
+function distractWords(correct, n=3){ return sample(wordData.filter(w=>w.word!==correct.word), n).map(w=>w.meaning); }
+function makeChoices(correct, options){ return shuffle([correct, ...options]).slice(0,4); }
+function maskWord(word, type="blank"){
+  if(type==="initial") return word.split(" ").map(part=>part[0] + "_".repeat(Math.max(2, part.length-1))).join(" ");
+  return word.split(" ").map(part=>{
+    if(part.length<=3) return part[0] + "_".repeat(Math.max(1,part.length-1));
+    if(part.length<=5) return part[0] + "_".repeat(part.length-2) + part.slice(-1);
+    return part.slice(0,2) + "_".repeat(part.length-4) + part.slice(-2);
+  }).join(" ");
+}
+function blankFor(phrase){ return String(phrase).split(" ").map(()=>"____").join(" "); }
+function scrambleWord(word){ return word.split(" ").map(part=>shuffle(part.split("")).join(" / ")).join("   +   "); }
+function escapeRegExp(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"); }
+function displayBlankSource(item){ return item.replace || item.text; }
+function makeSentenceBlank(sentence, hard=false){
+  const selected = hard ? sentence.blanks : sentence.blanks.slice(0, Math.min(3, sentence.blanks.length));
+  let text = sentence.text;
+  selected.forEach(item=>{
+    const source = displayBlankSource(item);
+    const re = new RegExp(escapeRegExp(source), "i");
+    text = text.replace(re, blankFor(item.text));
+  });
+  return {blankText:text, answers:selected.map(x=>x.text), answerSpecs:selected};
+}
+function sentenceTokens(s){ return s.text.replace(/[.!?]/g, m=>" "+m).split(/\s+/).filter(Boolean); }
+function splitAnswerInput(ans){ return ans.split(/[\/，,]/).map(x=>normalize(x)).filter(Boolean); }
+function findFirstMismatch(expected, actual){
+  const exp = String(expected||"");
+  const act = String(actual||"");
+  const max = Math.max(exp.length, act.length);
+  for(let i=0;i<max;i++){
+    if(exp[i] !== act[i]) return {pos:i+1, expected:exp[i] || "結束", actual:act[i] || "空白"};
+  }
+  return null;
+}
+function getWrongWarmups(limit=2){
+  const keys = Object.keys(state?.wrongItems || {}).sort((a,b)=>state.wrongItems[b].wrongCount-state.wrongItems[a].wrongCount);
+  const out = [];
+  for(const key of keys){
+    const w = wordData.find(x=>x.word===key);
+    if(w) out.push({type:"錯題複習", prompt:`錯題複習：請寫出英文：${w.meaning}`, answer:w.word, input:true, isWarmup:true});
+    if(out.length>=limit) break;
+  }
+  return out;
+}
+
+function buildQuestions(unit){
+  const core = [];
+  const words = wordItems(unit.words);
+  const sents = sentenceItems(unit.sentences);
+
+  function addRecognition(w){ core.push({type:"選中文", prompt:`${w.word} 的中文意思是什麼？`, answer:w.meaning, choices:makeChoices(w.meaning, distractWords(w))}); }
+  function addReverse(w){ const opts = sample(wordData.filter(x=>x.word!==w.word),3).map(x=>x.word); core.push({type:"選英文", prompt:`「${w.meaning}」的英文是什麼？`, answer:w.word, choices:makeChoices(w.word, opts)}); }
+  function addUnscramble(w){ core.push({type:"字母重組", prompt:`請重組英文：${w.meaning}`, detail:scrambleWord(w.word), answer:w.word, input:true}); }
+  function addInitial(w){ core.push({type:"首字母提示", prompt:`請輸入英文：${w.meaning}`, detail:maskWord(w.word,"initial"), answer:w.word, input:true}); }
+  function addBlank(w){ core.push({type:"缺字母填空", prompt:`請完成英文：${w.meaning}`, detail:maskWord(w.word,"blank"), answer:w.word, input:true}); }
+  function addDictation(w){ core.push({type:"生詞默寫", prompt:`請寫出英文：${w.meaning}`, answer:w.word, input:true}); }
+  function addSpellChoice(w){ const variants = makeSpellingVariants(w.word); core.push({type:"選正確拼法", prompt:`哪一個是「${w.meaning}」的正確英文？`, answer:w.word, choices:shuffle([w.word, ...variants]).slice(0,4)}); }
+  function addSentenceChoice(s){ const opts = sample(sentenceData.filter(x=>x.id!==s.id),3).map(x=>x.meaning); core.push({type:"句義選擇", prompt:s.text, answer:s.meaning, choices:makeChoices(s.meaning, opts)}); }
+  function addSentenceBlank(s, hard=false){ const b = makeSentenceBlank(s, hard); core.push({type:hard?"句子半默寫":"句子填空", prompt:`中文：${s.meaning}`, detail:b.blankText, answer:b.answers.join(" / "), multiAnswers:b.answers, answerSpecs:b.answerSpecs, input:true}); }
+  function addSentenceOrder(s){ core.push({type:"句子重組", prompt:`請重組英文：${s.meaning}`, tokens:shuffle(sentenceTokens(s)), answer:s.text, order:true}); }
+  function addSentenceDictation(s){ core.push({type:"句子默寫", prompt:`請完整寫出英文：${s.meaning}`, answer:s.text, input:true}); }
+
+  if(unit.mode==="recognition"){
+    words.forEach((w,i)=> i%2===0 ? addRecognition(w) : addReverse(w));
+    sents.forEach(addSentenceChoice);
+  }
+  if(unit.mode==="unscramble"){
+    words.forEach(addUnscramble);
+    sents.forEach(s=>addSentenceBlank(s,false));
+  }
+  if(unit.mode==="initial"){
+    words.forEach(addInitial);
+    sents.forEach(s=>addSentenceBlank(s,false));
+  }
+  if(unit.mode==="mixedEasy"){
+    sample(wordData,8).forEach((w,i)=> i%2===0 ? addRecognition(w) : addInitial(w));
+    sents.forEach(s=>addSentenceBlank(s,false));
+  }
+  if(unit.mode==="spellingChoice"){
+    words.forEach(w=>{ addSpellChoice(w); addBlank(w); });
+  }
+  if(unit.mode==="blank"){
+    words.forEach(addBlank);
+    sents.forEach(s=>addSentenceBlank(s,false));
+  }
+  if(unit.mode==="sentenceBlank"){
+    sents.forEach(s=>addSentenceBlank(s,false));
+    words.slice(0, Math.min(4, words.length)).forEach(addBlank);
+  }
+  if(unit.mode==="sentenceOrder"){
+    sents.forEach(addSentenceOrder);
+  }
+  if(unit.mode==="dictationWords"){
+    words.forEach(addDictation);
+  }
+  if(unit.mode==="sentenceBlankHard"){
+    sents.forEach(s=>addSentenceBlank(s,true));
+    wordData.forEach(addDictation);
+  }
+  if(unit.mode==="final"){
+    const wrongWords = Object.keys(state.wrongItems || {}).map(k=>wordData.find(w=>w.word===k)).filter(Boolean);
+    sample([...wrongWords, ...wordData], 15).forEach(addDictation);
+    sample(sentenceData, 8).forEach(addSentenceDictation);
+  }
+  const warmups = unit.id > 1 ? getWrongWarmups(2) : [];
+  return [...warmups, ...shuffle(core)];
+}
+
+function makeSpellingVariants(word){
+  const base = word.toLowerCase();
+  const vars = [];
+  if(base.includes("grammar")) vars.push(word.replace(/grammar/i,"grammer"), word.replace(/grammar/i,"gramar"));
+  if(base.includes("character")) vars.push(word.replace(/character/i,"charactor"));
+  if(base.includes("component")) vars.push(word.replace(/component/i,"compoment"));
+  if(base.includes("structure")) vars.push(word.replace(/structure/i,"structrue"));
+  if(base.includes("vocabulary")) vars.push(word.replace(/vocabulary/i,"vocaburary"));
+  if(base.includes("collocation")) vars.push(word.replace(/collocation/i,"colocation"));
+  if(base.includes("appropriate")) vars.push(word.replace(/appropriate/i,"appropiate"));
+  if(vars.length<3){ vars.push(word.replace(/[aeiou]/i,"")); vars.push(word + "e"); vars.push(word.slice(0,-1)); }
+  return [...new Set(vars.filter(v=>v && v!==word && wordData.some(w=>w.word===word)))].slice(0,3);
+}
+
+function renderDashboard(){
+  document.getElementById("loginCard").classList.add("hidden");
+  document.getElementById("practice").classList.add("hidden");
+  document.getElementById("result").classList.add("hidden");
+  document.getElementById("dashboard").classList.remove("hidden");
+  document.getElementById("welcome").textContent = `歡迎回來，${state.studentName || "同學"}`;
+  const done = state.completedUnits.length;
+  document.getElementById("summary").textContent = `已完成 ${done}/25 個單元。下一個建議單元：Unit ${Math.min(done+1,25)}。`;
+  document.getElementById("overallBar").style.width = `${done/25*100}%`;
+  const grid = document.getElementById("unitGrid");
+  grid.innerHTML = "";
+  units.forEach(u=>{
+    const done = state.completedUnits.includes(u.id);
+    const locked = u.id > 1 && !state.completedUnits.includes(u.id-1);
+    const div = document.createElement("div");
+    div.className = `unit ${done?"done":""} ${locked?"locked":""}`;
+    div.innerHTML = `<h3>Unit ${u.id}｜${u.title}</h3><p>${u.goal}</p><p class="small">分數：${state.unitScores[u.id] ?? "尚未完成"}</p>`;
+    const btn = document.createElement("button");
+    btn.textContent = done ? "重新練習" : locked ? "尚未解鎖" : "開始";
+    btn.disabled = locked;
+    btn.onclick = ()=>startUnit(u.id);
+    div.appendChild(btn);
+    grid.appendChild(div);
+  });
+  renderWrongList();
+}
+function renderWrongList(){
+  const box = document.getElementById("wrongList");
+  const entries = Object.entries(state.wrongItems || {}).sort((a,b)=>b[1].wrongCount-a[1].wrongCount);
+  if(entries.length===0){ box.innerHTML = `<p class="small">目前沒有錯題。</p>`; return; }
+  box.innerHTML = `<table><thead><tr><th>項目</th><th>錯誤次數</th><th>最近錯誤答案</th></tr></thead><tbody>${entries.map(([k,v])=>`<tr><td>${k}</td><td>${v.wrongCount}</td><td>${v.lastWrongAnswer||""}</td></tr>`).join("")}</tbody></table>`;
+}
+function startUnit(id){
+  currentUnit = units.find(u=>u.id===id);
+  questions = buildQuestions(currentUnit);
+  qIndex = 0; score = 0;
+  document.getElementById("dashboard").classList.add("hidden");
+  document.getElementById("result").classList.add("hidden");
+  document.getElementById("practice").classList.remove("hidden");
+  document.getElementById("unitTitle").textContent = `Unit ${currentUnit.id}｜${currentUnit.title}`;
+  document.getElementById("unitInfo").textContent = currentUnit.goal;
+  renderQuestion();
+}
+function renderQuestion(){
+  selectedAnswer = null; builtAnswer=[]; currentHintLevel=0;
+  const q = questions[qIndex];
+  document.getElementById("unitBar").style.width = `${qIndex/questions.length*100}%`;
+  document.getElementById("qType").textContent = q.type;
+  document.getElementById("qCount").textContent = `第 ${qIndex+1} / ${questions.length} 題`;
+  document.getElementById("prompt").textContent = q.prompt;
+  document.getElementById("feedback").innerHTML = "";
+  document.getElementById("checkBtn").classList.remove("hidden");
+  document.getElementById("nextBtn").classList.add("hidden");
+  document.getElementById("showAnswerBtn").textContent = q.choices ? "看正確答案" : "看答案並重打一次";
+  const area = document.getElementById("questionArea");
+  area.innerHTML = "";
+  if(q.detail) area.innerHTML += `<div class="hint mono">${q.detail}</div>`;
+  if(q.multiAnswers) area.innerHTML += `<p class="small">請依空格順序作答；多個答案請用逗號或斜線隔開，例如：form, word order。</p>`;
+  if(q.choices){
+    q.choices.forEach(c=>{
+      const btn = document.createElement("button");
+      btn.className = "choice";
+      btn.textContent = c;
+      btn.onclick = ()=>{ selectedAnswer=c; document.querySelectorAll(".choice").forEach(x=>x.style.background="#fff"); btn.style.background="#dbeafe"; };
+      area.appendChild(btn);
+    });
+  } else if(q.order){
+    const ans = document.createElement("div"); ans.className = "answerBox"; ans.id = "answerBox"; ans.textContent = "請依序點選下方單字。";
+    const bank = document.createElement("div"); bank.className = "wordbank";
+    q.tokens.forEach(tok=>{
+      const b = document.createElement("button"); b.textContent = tok; b.onclick=()=>{ builtAnswer.push(tok); b.disabled=true; ans.textContent=builtAnswer.join(" "); };
+      bank.appendChild(b);
+    });
+    const clear = document.createElement("button"); clear.className="secondary"; clear.textContent="清除重排"; clear.onclick=()=>renderQuestion();
+    area.appendChild(ans); area.appendChild(bank); area.appendChild(clear);
+  } else {
+    const input = document.createElement("input");
+    input.id = "answerInput";
+    input.placeholder = q.multiAnswers ? "請依序輸入答案，並用逗號或斜線隔開" : "請輸入答案";
+    input.autocomplete = "off";
+    input.onkeydown = (e)=>{ if(e.key==="Enter") checkAnswer(); };
+    area.appendChild(input);
+    setTimeout(()=>input.focus(),50);
+  }
+}
+function getUserAnswer(q){ if(q.choices) return selectedAnswer; if(q.order) return builtAnswer.join(" "); return document.getElementById("answerInput")?.value || ""; }
+function checkMultiAnswer(q, ans){
+  const parts = splitAnswerInput(ans);
+  if(parts.length !== q.answerSpecs.length) return false;
+  return q.answerSpecs.every((spec,i)=>{
+    const accepted = (spec.accept || [spec.text]).map(x=>normalize(x));
+    return accepted.includes(parts[i]);
+  });
+}
+function checkAnswer(){
+  const q = questions[qIndex];
+  const ans = getUserAnswer(q);
+  if(!ans){ showFeedback("bad","請先作答。"); return; }
+  const correct = q.multiAnswers ? checkMultiAnswer(q, ans) : exact(ans, q.answer);
+  if(correct){
+    score++;
+    showFeedback("ok",`答對了。答案：<b>${q.answer}</b>`);
+    document.getElementById("checkBtn").classList.add("hidden");
+    document.getElementById("nextBtn").classList.remove("hidden");
+  } else {
+    recordWrong(q.answer, ans);
+    const hint = makeHint(q, ans, currentHintLevel++);
+    showFeedback("bad",`還不正確。${hint}<br><span class="small">你輸入的是：${ans}</span>`);
+    save();
+  }
+}
+function showFeedback(kind,msg){ document.getElementById("feedback").innerHTML = `<div class="feedback ${kind}">${msg}</div>`; }
+function makeHint(q, userAnswer, level){
+  if(q.multiAnswers){
+    if(level===0) return `提示：答案要依空格順序填寫，共 ${q.answerSpecs.length} 個答案。`;
+    return `提示：<b>${q.answer}</b>`;
+  }
+  const mismatch = findFirstMismatch(q.answer, userAnswer);
+  if(level===0 && mismatch) return `提示：第 ${mismatch.pos} 個字元應該是 <b>${mismatch.expected}</b>。`;
+  if(level===1) return `提示：<span class="mono">${maskWord(String(q.answer),"blank")}</span>`;
+  return `請看正確答案後，再輸入一次：<b>${q.answer}</b>`;
+}
+function recordWrong(correct, wrong){
+  if(!state.wrongItems[correct]) state.wrongItems[correct] = {wrongCount:0,lastWrongAnswer:"",lastWrongAt:""};
+  state.wrongItems[correct].wrongCount++;
+  state.wrongItems[correct].lastWrongAnswer = wrong;
+  state.wrongItems[correct].lastWrongAt = new Date().toISOString();
+}
+function nextQuestion(){ qIndex++; if(qIndex>=questions.length) finishUnit(); else renderQuestion(); }
+function finishUnit(){
+  const percent = Math.round(score/questions.length*100);
+  state.unitScores[currentUnit.id] = percent;
+  if(!state.completedUnits.includes(currentUnit.id)) state.completedUnits.push(currentUnit.id);
+  state.completedUnits.sort((a,b)=>a-b);
+  state.attempts.push({unit:currentUnit.id, score:percent, at:new Date().toISOString()});
+  save();
+  document.getElementById("practice").classList.add("hidden");
+  document.getElementById("result").classList.remove("hidden");
+  document.getElementById("resultText").innerHTML = `本單元分數：<b>${percent}</b>。答對 ${score}/${questions.length} 題。`;
+}
+
+function exportProgress(){
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const safeName = `${state.studentName || "student"}_${state.studentId || "id"}`.replace(/[^\w\u4e00-\u9fa5-]/g,"_");
+  a.href = url; a.download = `華語教學英文_${safeName}_進度.json`; a.click();
+  URL.revokeObjectURL(url);
+}
+function importProgress(file){
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const data = JSON.parse(reader.result);
+      if(!data || !Array.isArray(data.completedUnits) || !data.unitScores) throw new Error("格式不正確");
+      state = data; save(); alert("進度匯入完成。可以繼續練習。"); renderDashboard();
+    }catch(e){ alert("匯入失敗：這不是有效的進度檔。"); }
+  };
+  reader.readAsText(file);
+}
+
+function init(){
+  const saved = load();
+  if(saved){ state = saved; document.getElementById("studentName").value = state.studentName || ""; document.getElementById("studentId").value = state.studentId || ""; }
+  document.getElementById("startBtn").onclick = ()=>{
+    const name = document.getElementById("studentName").value.trim();
+    const id = document.getElementById("studentId").value.trim();
+    if(!state) state = defaultState(name,id);
+    state.studentName = name || state.studentName;
+    state.studentId = id || state.studentId;
+    save(); renderDashboard();
+  };
+  document.getElementById("backBtn").onclick = renderDashboard;
+  document.getElementById("resultBackBtn").onclick = renderDashboard;
+  document.getElementById("checkBtn").onclick = checkAnswer;
+  document.getElementById("nextBtn").onclick = nextQuestion;
+  document.getElementById("hintBtn").onclick = ()=>{ const q = questions[qIndex]; showFeedback("bad", makeHint(q, getUserAnswer(q), currentHintLevel++)); };
+  document.getElementById("showAnswerBtn").onclick = ()=>{
+    const q = questions[qIndex];
+    if(q.choices){ showFeedback("bad",`正確答案是：<b>${q.answer}</b>`); return; }
+    showFeedback("bad",`正確答案是：<b>${q.answer}</b><br>請照著輸入一次，再按「檢查答案」。`);
+    if(!q.order){ document.getElementById("answerInput").value = q.answer; }
+  };
+  document.getElementById("exportBtn").onclick = exportProgress;
+  document.getElementById("importBtn").onclick = ()=>document.getElementById("importFile").click();
+  document.getElementById("importBtnTop").onclick = ()=>document.getElementById("importFileTop").click();
+  document.getElementById("importFile").onchange = e=> e.target.files[0] && importProgress(e.target.files[0]);
+  document.getElementById("importFileTop").onchange = e=> e.target.files[0] && importProgress(e.target.files[0]);
+  document.getElementById("resetBtn").onclick = ()=>{
+    if(confirm("確定要清除這台設備上的進度嗎？建議先匯出備份。")){
+      localStorage.removeItem(STORAGE_KEY); state=null; location.reload();
+    }
+  };
+}
+init();
+</script>
+</body>
+</html>
